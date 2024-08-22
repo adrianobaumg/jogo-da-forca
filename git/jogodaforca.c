@@ -8,7 +8,7 @@
 #define MAX_TAM_PALAVRA 47     // Define o tamanho máximo de uma palavra
 
 // Variáveis globais utilizadas no jogo
-int numero_de_letras, placar_partida = 0, index_aleatorio, numero_de_erros = 0, controle_tabuleiro = 1;
+int numero_de_erros = 0;
 char palavra[47], letra, palavra_ficticia[47];  // Arrays para armazenar a palavra, uma letra, e a palavra fictícia (escondida)
 
 
@@ -64,25 +64,25 @@ void deixar_maiuscula(char *pal) {
 }
 
 // Função para procurar a letra digitada na palavra
-void procurar(){
+void procurar(int numero_de_letras, int *placar_partida, int *controle_tabuleiro){
     int a = numero_de_letras;
     for(int i = 0; i < numero_de_letras; i++){
         if(palavra[i] == letra){  // Se a letra estiver na palavra
             if (palavra_ficticia[i]=='_'){  // Se a letra ainda não foi adivinhada
                 palavra_ficticia[i] = letra;  // Atualiza a palavra fictícia com a letra correta
-                placar_partida++;  // Incrementa o placar
-                controle_tabuleiro = 1;
+                *placar_partida+=1;  // Incrementa o placar
+                *controle_tabuleiro = 1;
                 a++;
             } else {
                 printf("Letra já inserida anteriormente, tente novamente\n");
                 letra = '@';  // Letra já usada
-                controle_tabuleiro = 0;
+                *controle_tabuleiro = 0;
                 a++;
             }
         } else if (a<=1){  // Se a letra não estiver na palavra
             printf("Não possui essa letra, tente novamente\n");
             numero_de_erros++;  // Incrementa o número de erros
-            controle_tabuleiro = 1;
+            *controle_tabuleiro = 1;
         } else {
             a--;
         }
@@ -93,7 +93,7 @@ void procurar(){
 void gerar_palavra () {
     FILE *file;
     char palavras[MAX_LINHAS][MAX_TAM_PALAVRA];  // Array para armazenar as palavras do arquivo
-    int num_palavras = 0, i = 0;
+    int num_palavras = 0, i = 0, index_aleatorio;
      
     // Abrir o arquivo para leitura
     file = fopen("palavras.txt", "r");
@@ -130,7 +130,7 @@ void gerar_palavra () {
 
 // Função principal
 int main() {
-    int controle_jogo = 0;  // Variável para controlar a continuidade do jogo
+    int controle_jogo = 0, numero_de_letras, placar_partida = 0, controle_tabuleiro = 1; 
     for(controle_jogo = 0; controle_jogo < 1;){
         numero_de_erros = 0;
         gerar_palavra();  // Gera uma nova palavra para o jogo
@@ -147,7 +147,7 @@ int main() {
             digite_letra();  // Solicita uma letra ao jogador
             deixar_maiuscula(&letra);  // Converte a letra para maiúscula
             deixar_maiuscula(palavra);  // Converte a palavra para maiúscula (caso ainda não tenha sido)
-            procurar();  // Verifica se a letra está na palavra
+            procurar(numero_de_letras, &placar_partida, &controle_tabuleiro);  // Verifica se a letra está na palavra
             if (controle_tabuleiro == 1){
                 mostrar_tabuleiro(numero_de_letras);  // Atualiza o tabuleiro se necessário
             }
