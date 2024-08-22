@@ -8,7 +8,6 @@
 #define MAX_TAM_PALAVRA 47     // Define o tamanho máximo de uma palavra
 
 // Variáveis globais utilizadas no jogo
-int numero_de_erros = 0;
 char palavra[47], letra, palavra_ficticia[47];  // Arrays para armazenar a palavra, uma letra, e a palavra fictícia (escondida)
 
 
@@ -21,7 +20,7 @@ void limpar_palavra_ficticia(int numeroltrs){
 }
 
 // Função para mostrar o estado atual do tabuleiro com base no número de erros
-void mostrar_tabuleiro(int num){
+void mostrar_tabuleiro(int num, int numero_de_erros){
     switch (numero_de_erros)
     {
     case 0: printf("\n_______\n|     |\n|\n|\n|\n|\n|\n|\n|  ");       
@@ -64,7 +63,7 @@ void deixar_maiuscula(char *pal) {
 }
 
 // Função para procurar a letra digitada na palavra
-void procurar(int numero_de_letras, int *placar_partida, int *controle_tabuleiro){
+void procurar(int numero_de_letras, int *placar_partida, int *controle_tabuleiro, int *numero_de_erros){
     int a = numero_de_letras;
     for(int i = 0; i < numero_de_letras; i++){
         if(palavra[i] == letra){  // Se a letra estiver na palavra
@@ -81,7 +80,7 @@ void procurar(int numero_de_letras, int *placar_partida, int *controle_tabuleiro
             }
         } else if (a<=1){  // Se a letra não estiver na palavra
             printf("Não possui essa letra, tente novamente\n");
-            numero_de_erros++;  // Incrementa o número de erros
+            *numero_de_erros+=1;  // Incrementa o número de erros
             *controle_tabuleiro = 1;
         } else {
             a--;
@@ -130,7 +129,7 @@ void gerar_palavra () {
 
 // Função principal
 int main() {
-    int controle_jogo = 0, numero_de_letras, placar_partida = 0, controle_tabuleiro = 1; 
+    int controle_jogo = 0, numero_de_letras, placar_partida = 0, controle_tabuleiro = 1, numero_de_erros = 0; 
     for(controle_jogo = 0; controle_jogo < 1;){
         numero_de_erros = 0;
         gerar_palavra();  // Gera uma nova palavra para o jogo
@@ -140,16 +139,16 @@ int main() {
 
         limpar_palavra_ficticia(numero_de_letras);  // Inicializa a palavra fictícia com underscores
         
-        mostrar_tabuleiro(numero_de_letras);  // Exibe o tabuleiro inicial
+        mostrar_tabuleiro(numero_de_letras, numero_de_erros);  // Exibe o tabuleiro inicial
 
         // Loop principal do jogo, continua até que a palavra seja adivinhada ou que o jogador cometa 7 erros
         for(placar_partida = 0; placar_partida < numero_de_letras && numero_de_erros < 7;){
             digite_letra();  // Solicita uma letra ao jogador
             deixar_maiuscula(&letra);  // Converte a letra para maiúscula
             deixar_maiuscula(palavra);  // Converte a palavra para maiúscula (caso ainda não tenha sido)
-            procurar(numero_de_letras, &placar_partida, &controle_tabuleiro);  // Verifica se a letra está na palavra
+            procurar(numero_de_letras, &placar_partida, &controle_tabuleiro, &numero_de_erros);  // Verifica se a letra está na palavra
             if (controle_tabuleiro == 1){
-                mostrar_tabuleiro(numero_de_letras);  // Atualiza o tabuleiro se necessário
+                mostrar_tabuleiro(numero_de_letras, numero_de_erros);  // Atualiza o tabuleiro se necessário
             }
 
             // Exibe o status do jogo
